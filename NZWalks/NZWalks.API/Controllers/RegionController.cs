@@ -12,13 +12,11 @@ namespace NZWalks.API.Controllers
     [ApiController]
     public class RegionController : ControllerBase
     {
-        private readonly NZWalksDbContext dbConext;
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
         public RegionController(NZWalksDbContext dbContext,IRegionRepository regionRepository,IMapper mapper) 
         {
 
-            this.dbConext = dbContext;
             this.regionRepository = regionRepository;
             this.mapper = mapper;
 
@@ -64,7 +62,6 @@ namespace NZWalks.API.Controllers
 
             //Map the Domain Model to DTO
             var regionDTOResponse = mapper.Map<RegionDTO>(regionDM);
-            Console.WriteLine(regionDTOResponse);
 
             return CreatedAtAction(nameof(GetById), new { Id = regionDM.Id }, regionDTOResponse);
         }
