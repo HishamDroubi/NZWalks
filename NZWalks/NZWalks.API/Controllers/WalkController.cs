@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.CustomActionFilter;
@@ -9,6 +10,8 @@ namespace NZWalks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+
     public class WalkController : ControllerBase
     {
 
@@ -22,17 +25,25 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles="Reader,Writer")]
         public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery,
             [FromQuery] string? sortBy, [FromQuery] bool? isAscending,
             [FromQuery] int pageNumber, [FromQuery]  int pageSize) {
-         
-          var walks= await walkRepository.GetAllAsync(filterOn, filterQuery, sortBy,isAscending?? true, pageNumber, pageSize);
+
+
+            var x = Request.Headers.Authorization;
+            Console.WriteLine("this is the JWT");
+            Console.WriteLine(x);
+
+
+            var walks= await walkRepository.GetAllAsync(filterOn, filterQuery, sortBy,isAscending?? true, pageNumber, pageSize);
           return Ok(mapper.Map<List<WalkDTO>>(walks));
 
         }
 
         [HttpGet]
         [Route("{Id}")]
+        [Authorize(Roles = "Reader,Writer")]
         public async Task<IActionResult> GetById([FromRoute] Guid Id)
         {
             var walk = await walkRepository.GetByIdAsync(Id);
@@ -47,6 +58,7 @@ namespace NZWalks.API.Controllers
 
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create (AddWalkDTO addDTO)
         {
 
@@ -60,6 +72,7 @@ namespace NZWalks.API.Controllers
         [HttpPut]
         [ValidateModel]
         [Route("{Id}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Update([FromRoute] Guid Id,  UpdateWalkDTO updateDTO)
         {
 
@@ -78,6 +91,7 @@ namespace NZWalks.API.Controllers
 
         [HttpDelete]
         [Route("{Id}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Delete([FromRoute] Guid Id)
         {
 
